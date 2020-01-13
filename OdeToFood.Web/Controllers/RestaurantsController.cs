@@ -18,12 +18,14 @@ namespace OdeToFood.Web.Controllers
 
 
         // GET: Restaurants
+        [HttpGet]
         public ActionResult Index()
         {
 
             var model = db.GetAll();
             return View(model);
         }
+        [HttpGet]
         public ActionResult Details(int id)
         {
             var model = db.Get(id);
@@ -44,8 +46,43 @@ namespace OdeToFood.Web.Controllers
         [HttpPost]
         public ActionResult Create(Restaurant restaurant)
         {
-            db.Add(restaurant);
+            //if (string.IsNullOrEmpty(restaurant.Name))
+            //{
+            //    ModelState.AddModelError(nameof(restaurant.Name), "The Name is required");
+            //}
+            if (ModelState.IsValid)
+            {
+                db.Add(restaurant);
+                return RedirectToAction("Details", new { id = restaurant.Id });
+            }
             return View();
         }
+
+        public ActionResult Edit(int id)
+        {
+            var model = db.Get(id);
+            if (model == null)
+            {
+                return HttpNotFound();
+            }
+            return View(model);
+        }
+
+        [ValidateAntiForgeryToken]
+        [HttpPost]
+        public ActionResult Edit(Restaurant restaurant)
+        {
+            //if (string.IsNullOrEmpty(restaurant.Name))
+            //{
+            //    ModelState.AddModelError(nameof(restaurant.Name), "The Name is required");
+            //}
+            if (ModelState.IsValid)
+            {
+                db.Update(restaurant);
+                return RedirectToAction("Details", new { id = restaurant.Id });
+            }
+            return View(restaurant);
+        }
     }
+
 }
